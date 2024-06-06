@@ -1,0 +1,143 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  name     String?
+  password String
+  image    String?
+  roleId   Int     @default(3)
+  role     Role    @relation(fields: [roleId], references: [id])
+
+  isActive  Boolean   @default(true)
+  isDeleted Boolean   @default(false)
+  delUserId Int?
+  deletedAt DateTime?
+  updatedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  isVerified Boolean @default(false)
+
+  // tokens Token[]
+}
+
+model Token {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  type       String // EMAIL|API
+  emailToken String? @unique
+
+  valid      Boolean  @default(true)
+  expiration DateTime
+
+  eventRegister   eventRegister? @relation(fields: [eventRegisterId], references: [id])
+  eventRegisterId Int?
+}
+
+model Role {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  User User[]
+}
+
+model Menus {
+  id          Int       @id @default(autoincrement())
+  name        String
+  url         String
+  orderId     Int?      @default(0)
+  isActive    Boolean?  @default(true)
+  isDeleted   Boolean?  @default(false)
+  deletedUser Int?
+  deletedDate DateTime? @default(now())
+}
+
+model Permissions {
+  id           Int @id @default(autoincrement())
+  roleId       Int
+  permissionId Int
+}
+
+model Level {
+  id        Int       @id @default(autoincrement())
+  name      String
+  desc      String
+  isActive  Boolean   @default(true)
+  delUserId Int?
+  deletedAt DateTime?
+  updatedAt DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model Version {
+  id        Int       @id @default(autoincrement())
+  name      String
+  desc      String
+  isActive  Boolean   @default(true)
+  delUserId Int?
+  deletedAt DateTime?
+  updatedAt DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model LogType {
+  id        Int       @id @default(autoincrement())
+  name      String
+  desc      String
+  logs      Logs[]
+  updatedAt DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model Logs {
+  id        Int       @id @default(autoincrement())
+  logTypeId Int?      @default(1)
+  desc      String
+  logType   LogType?  @relation(fields: [logTypeId], references: [id])
+  updatedAt DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model Setting {
+  id        Int       @id @default(autoincrement())
+  data      String
+  name      String
+  desc      String?
+  image     String?
+  url       String?
+  value     String?
+  isActive  Boolean   @default(true)
+  delUserId Int?
+  deletedAt DateTime?
+  updatedAt DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model eventRegister {
+  id        Int       @id @default(autoincrement())
+  firstName String
+  lastName  String?
+  phone     String   @unique
+  inc       String?
+  position  String?
+  email     String    @unique
+  value     String?
+  isActive  Boolean   @default(false)
+  delUserId Int?
+  deletedAt DateTime?
+  updatedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  tokens Token[]
+}
